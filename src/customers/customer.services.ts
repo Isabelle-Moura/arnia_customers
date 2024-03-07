@@ -19,4 +19,20 @@ export class CustomerService {
   listAll(): Customer[] {
     return this.customers;
   }
+
+  listByAge(age: number): Customer[] {
+    return this.customers.filter((customer) => customer.age === age);
+  }
+
+  getById(id: number): Customer {
+    return this.customers.find((customer) => customer.id === id);
+  }
+
+  updateById(id: number, data: Partial<CreateCustomerDto>): Customer {
+    const customer = this.getById(id);
+
+    Object.assign(customer, data);
+
+    return customer;
+  }
 }
