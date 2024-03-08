@@ -8,51 +8,42 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Delete,
 } from '@nestjs/common';
-import { CreateCustomerDto } from 'src/dto/customer.dto';
+import { CreateCustomerDto } from 'src/customers/dto/create-customer.dto';
 import { Customer } from 'src/entities/customer.entity';
 import { CustomerService } from './customer.services';
-
-/* 
-   FIXME: Refatorar aqui (jogar o que é de lógica lá no service).
-   TODO: Testar as funções no Insomnia.
-*/
+import { UpdateCustomerDto } from 'src/customers/dto/update-customer.dto';
 
 @Controller('customer')
 export class CustomerController {
   constructor(private customerService: CustomerService) {}
 
-  @Post()
+  @Post('create-new-customer')
   create(@Body() data: CreateCustomerDto) {
     return this.customerService.create(data);
   }
 
-  @Get()
+  @Get('get-all-customers')
   listAll(@Query('age') age?: number): Customer[] {
-    if (age) {
-      return this.customerService.listByAge(age);
-    }
-    return this.customerService.listAll();
+    return this.customerService.listAll(age);
   }
 
-  @Get('id')
+  @Get('get-customer/:id')
   getCustomerById(@Param('id', ParseIntPipe) id: number): Customer {
-    const customer = this.customerService.getById(id);
-    if (!customer) {
-      throw new NotFoundException('Customer not found.');
-    }
-    return customer;
+    return this.customerService.getById(id);
   }
 
-  @Patch(':id')
+  @Patch('update-customer/:id')
   updateCustomerById(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Partial<CreateCustomerDto>,
+    @Body() data: UpdateCustomerDto,
   ): Customer {
-    const updatedCustomer = this.customerService.updateById(id, data);
-    if (!updatedCustomer) {
-      throw new NotFoundException('Customer not found.');
-    }
-    return updatedCustomer;
+    return this.customerService.updateById(id, data);
+  }
+
+  @Delete('delete-customer/:id')
+  deleteCustomerById(@Param('id', ParseIntPipe) id: number) {
+    return this.customerService.deleteById(id);
   }
 }
